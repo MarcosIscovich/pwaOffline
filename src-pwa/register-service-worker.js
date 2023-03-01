@@ -29,15 +29,15 @@ register(process.env.SERVICE_WORKER_FILE, {
   },
 
   updated (/* registration */) {
-   /*  Notify.create({
-      message: 'New content is available; please refresh.',
+    Notify.create({
+      message: 'Nueva actualización disponible',
       icon: 'mdi-cloud_download',
-      closeBtn: 'Refresh',
+      closeBtn: 'Actualizar',
       timeout: 10000,
       onDismiss () {
         location.reload(true)
       }
-    }) */
+    })
     // console.log('New content is available; please refresh.')
   },
 
