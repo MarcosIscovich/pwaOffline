@@ -176,7 +176,7 @@ const openVar = () => {
 };
 
 onMounted(() => {
-  let request = indexedDB.open("variables2", 1);
+  /* let request = indexedDB.open("variables2", 1);
   request.onsuccess = function (event) {
     let db = event.target.result;
   };
@@ -193,7 +193,7 @@ onMounted(() => {
       valor: variables.value,
       fecha: date.formatDate(new Date(), "YYYY-MM-DD HH:mm:ss"),
     });
-  };
+  }; */
 
   navigator.onLine &&
     $q.notify({
