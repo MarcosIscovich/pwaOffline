@@ -134,11 +134,6 @@ const variables = ref([
 const submitForm = () => {
   console.log(variables.value);
 
-  objectStore.add({
-    valor: variables.value,
-    fecha: date.formatDate(new Date(), "YYYY-MM-DD HH:mm:ss"),
-  });
-
   /*  variables.value = [
     { valor: null },
     { valor: null },
@@ -176,24 +171,7 @@ const openVar = () => {
 };
 
 onMounted(() => {
-  /* let request = indexedDB.open("variables2", 1);
-  request.onsuccess = function (event) {
-    let db = event.target.result;
-  };
-
-  request.onupgradeneeded = function (event) {
-    let db = event.target.result;
-    var objectStore = db.createObjectStore("datosVariables", {
-      keyPath: "id",
-      autoIncrement: true,
-    });
-    objectStore.createIndex("valor", "valor", { unique: false });
-    objectStore.createIndex("fecha", "fecha", { unique: false });
-    objectStore.add({
-      valor: variables.value,
-      fecha: date.formatDate(new Date(), "YYYY-MM-DD HH:mm:ss"),
-    });
-  }; */
+ 
 
   navigator.onLine &&
     $q.notify({
