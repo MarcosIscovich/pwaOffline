@@ -2,6 +2,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import { useQuasar } from "quasar";
 
+
 const systemOnline = ref(false);
 
 const $q = useQuasar();
@@ -57,6 +58,7 @@ const openPage = () => {
     title: "Funciona el boton",
     message: "Este boton si funciona",
   });
+
 };
 
 onMounted(() => {
@@ -86,8 +88,8 @@ onMounted(() => {
             direction="down"
             flat
           >
-            <q-fab-action color="primary" @click="openPage" icon="mail" label="Nueva Rutina" />
-            <q-fab-action color="secondary" @click="openPage" icon="alarm" label="Editar Variable" />
+            <q-fab-action color="primary" to="newComponente" icon="mail" label="Nueva Rutina" />
+            <q-fab-action color="secondary" to="/" icon="alarm" label="Editar Variable" />
             <q-fab-action color="orange" @click="openPage" icon="airplay" label="Buscar Rutina" />
             <q-fab-action color="accent" @click="openPage" icon="room" label="Nueva Medición" />
           </q-fab>
@@ -96,7 +98,7 @@ onMounted(() => {
         <q-toolbar-title> Nuevo sistema de Mediciones </q-toolbar-title>
 
         <div>
-          <q-icon :name="systemOnline ? 'wifi' : 'mdi-wifi-off'" :color="systemOnline ? 'secondary' : 'negative'" size="4rem"/> 
+          <q-icon :name="systemOnline ? 'wifi' : 'mdi-wifi-off'" :color="systemOnline ? 'secondary' : 'negative'" size="4rem"/>
         </div>
       </q-toolbar>
     </q-header>
