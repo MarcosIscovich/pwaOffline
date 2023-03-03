@@ -4,6 +4,11 @@ import { ref, onMounted } from "vue";
 import Swal from "sweetalert2";
 
 const $q = useQuasar();
+const db = ref(null);
+const tx = ref(null);
+const store = ref(null);
+const index = ref(null);
+const recData = ref([]);
 
 /* const variables = [
   {
@@ -119,33 +124,164 @@ const $q = useQuasar();
 ]; */
 
 const variables = ref([
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
-  { value: null },
+  { datos: null },
+  { datos: null },
+  /* { datos: null },
+  { datos: null },
+  { datos: null },
+  { datos: null },
+  { datos: null },
+  { datos: null },
+  { datos: null },
+  { datos: null }, */
 ]);
 
-const submitForm = () => {
+const submitForm = async () => {
   console.log(variables.value);
 
-  /*  variables.value = [
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-    { valor: null },
-  ]; */
+  let request = window.indexedDB.open("BaseDatosVariables", 1);
+
+  request.onupgradeneeded = (e) => {
+    db.value = request.result;
+    store.value = db.value.createObjectStore("Variables", { keyPath: "id", autoIncrement: true });
+    index.value = store.value.createIndex("VariablesDatos", "id", { unique: false });
+  };
+
+  request.onerror = (e) => {
+    console.log("Error al abrir la base de datos" + e.target.errorCode);
+  };
+
+  await onsuccess(request);
+  //clearForm();
+
+  /*  request.onsuccess = (e) => {
+    console.log("Base de datos abierta");
+    db.value = request.result;
+    tx.value = db.value.transaction("Variables", "readwrite");
+    store.value = tx.value.objectStore("Variables");
+    index.value = store.value.index("VariablesDatos");
+
+
+    variables.value.map((variable , idx) => {
+      console.log(variable);
+      let dato = variable.datos;
+      store.value.put({ datos: dato , variable: "Variable " + (idx + 1) })
+    });
+
+    db.value.onerror = (e) => {
+      console.log("Error al abrir la base de datos" + e.target.errorCode);
+    };
+  } */
+};
+
+const onsuccess = (data) => {
+  data.onsuccess = (e) => {
+    console.log("Base de datos abierta");
+    db.value = data.result;
+    tx.value = db.value.transaction("Variables", "readwrite");
+    store.value = tx.value.objectStore("Variables");
+    index.value = store.value.index("VariablesDatos");
+
+    variables.value.map((variable, idx) => {
+      console.log(variable);
+      let dato = variable.datos;
+      store.value.put({ datos: dato, variable: "Variable " + (idx + 1), fecha: new Date(Date.now()).toLocaleString() });
+    });
+
+    db.value.onerror = (e) => {
+      console.log("Error al abrir la base de datos" + e.target.errorCode);
+    };
+
+    tx.value.oncomplete = () => {
+      db.value.close();
+      console.log("Transaccion completada");
+    };
+  };
+};
+
+const clearForm = () => {
+  variables.value = [
+    { datos: null },
+    { datos: null },
+    /*  { datos: null },
+    { datos: null },
+    { datos: null },
+    { datos: null },
+    { datos: null },
+    { datos: null },
+    { datos: null },
+    { datos: null }, */
+  ];
+};
+
+const recoveryData = () => {
+  recData.value = [];
+  let request = window.indexedDB.open("BaseDatosVariables", 1);
+
+  request.onupgradeneeded = (e) => {
+    db.value = request.result;
+    store.value = db.value.createObjectStore("Variables", { keyPath: "id", autoIncrement: true });
+    index.value = store.value.createIndex("VariablesDatos", "id", { unique: false });
+  };
+
+  request.onerror = (e) => {
+    console.log("Error al abrir la base de datos" + e.target.errorCode);
+  };
+
+  request.onsuccess = (e) => {
+    console.log("Base de datos abierta");
+    db.value = request.result;
+    tx.value = db.value.transaction("Variables", "readonly");
+    store.value = tx.value.objectStore("Variables");
+    index.value = store.value.index("VariablesDatos");
+
+    let cursor = store.value.openCursor();
+
+    cursor.onsuccess = (e) => {
+      let result = e.target.result;
+      if (result === null) {
+        return;
+      }
+      console.log("RESULT", result.value);
+
+      recData.value.push(result.value);
+      console.log("REC DATA", recData.value);
+      Swal.fire({
+        title: "Variables",
+        html: `
+        ${recData.value.map((variable, index) => {
+          return `
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+              <q-card
+      class="my-card text-white"
+      style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%)"
+    >
+      <q-card-section class="q-pt-none col">
+        ${variable.variable}
+valor ->${variable.datos}
+fecha ->${variable.fecha}
+      </q-card-section>
+
+    </q-card>
+          </div>
+
+
+    `;
+        })}
+        `,
+      });
+      result.continue();
+    };
+
+    tx.value.oncomplete = () => {
+      db.value.close();
+      console.log("Transaccion completada");
+    };
+
+    db.value.onerror = (e) => {
+      console.log("Error al abrir la base de datos" + e.target.errorCode);
+    };
+  };
 };
 
 const openVar = () => {
@@ -159,7 +295,7 @@ const openVar = () => {
         <q-item clickable v-ripple>
         <q-item-section>
           <q-item-label> varaible ${index + 1}</q-item-label>
-          <q-item-label caption>valor = ${variable.valor}</q-item-label>
+          <q-item-label caption>valor = ${variable.datos}</q-item-label>
         </q-item-section>
       </q-item>
     </div>
@@ -171,8 +307,6 @@ const openVar = () => {
 };
 
 onMounted(() => {
- 
-
   navigator.onLine &&
     $q.notify({
       message: "Conectado a internet",
@@ -187,13 +321,13 @@ onMounted(() => {
     <div class="col">
       <div class="flex justify-between">
         <q-btn @click="openVar" color="primary" label="Ver datos" />
-        <q-btn @click="openVar" color="secondary" label="Recuperar Datos" />
+        <q-btn @click="recoveryData" color="secondary" label="Recuperar Datos" />
       </div>
 
       <q-form ref="form" @submit="submitForm">
         <q-card>
           <q-card-section>
-            <q-input v-for="(variable, index) in variables" :key="index" :label="'Variable ' + (index + 1)" v-model="variable.valor" type="number" />
+            <q-input v-for="(variable, index) in variables" :key="index" :label="'Variable ' + (index + 1)" v-model="variable.datos" type="number" />
           </q-card-section>
           <q-card-actions>
             <q-btn type="submit" color="primary" label="Guardar" />
