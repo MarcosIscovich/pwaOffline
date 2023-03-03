@@ -284,6 +284,50 @@ fecha ->${variable.fecha}
   };
 };
 
+const cleanBD = () => {
+  let request = window.indexedDB.open("BaseDatosVariables", 1);
+
+  request.onupgradeneeded = (e) => {
+    db.value = request.result;
+    store.value = db.value.createObjectStore("Variables", { keyPath: "id", autoIncrement: true });
+    index.value = store.value.createIndex("VariablesDatos", "id", { unique: false });
+  };
+
+  request.onerror = (e) => {
+    console.log("Error al abrir la base de datos" + e.target.errorCode);
+  };
+
+  request.onsuccess = (e) => {
+    console.log("Base de datos abierta");
+    db.value = request.result;
+    tx.value = db.value.transaction("Variables", "readwrite");
+    store.value = tx.value.objectStore("Variables");
+    index.value = store.value.index("VariablesDatos");
+
+    let cursor = store.value.openCursor();
+
+    cursor.onsuccess = (e) => {
+      let result = e.target.result;
+      if (result === null) {
+        return;
+      }
+      
+
+      store.value.delete(result.value.id);
+      result.continue();
+    };
+
+    tx.value.oncomplete = () => {
+      db.value.close();
+      console.log("Transaccion completada");
+    };
+
+    db.value.onerror = (e) => {
+      console.log("Error al abrir la base de datos" + e.target.errorCode);
+    };
+  };
+}
+
 const openVar = () => {
   Swal.fire({
     title: "Variables",
@@ -321,6 +365,7 @@ onMounted(() => {
     <div class="col">
       <div class="flex justify-between">
         <q-btn @click="openVar" color="primary" label="Ver datos" />
+        <q-btn @click="cleanBD" color="negative" label="Limpiar base de datos" />
         <q-btn @click="recoveryData" color="secondary" label="Recuperar Datos" />
       </div>
 
