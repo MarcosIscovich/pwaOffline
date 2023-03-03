@@ -2,7 +2,10 @@ const routes = [
   {
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/IndexPage.vue") }],
+    children: [
+      { path: "", component: () => import("pages/IndexPage.vue") },
+      { path: "/newcomponente", component: () => import("pages/NewComponente.vue") },
+    ],
   },
 
   // Always leave this as last one,
@@ -10,12 +13,6 @@ const routes = [
   {
     path: "/:catchAll(.*)*",
     component: () => import("pages/ErrorNotFound.vue"),
-  },
-
-  {
-    path: "/newcomponente",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/NewComponente.vue") }],
   },
 ];
 
