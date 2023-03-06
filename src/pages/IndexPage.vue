@@ -311,7 +311,6 @@ const cleanBD = () => {
       if (result === null) {
         return;
       }
-      
 
       store.value.delete(result.value.id);
       result.continue();
@@ -326,7 +325,7 @@ const cleanBD = () => {
       console.log("Error al abrir la base de datos" + e.target.errorCode);
     };
   };
-}
+};
 
 const openVar = () => {
   Swal.fire({
