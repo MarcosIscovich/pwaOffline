@@ -95,7 +95,7 @@ onMounted(() => {
           </q-fab>
         </div>
 
-        <q-toolbar-title> Nuevo sistema de Mediciones </q-toolbar-title>
+        <q-toolbar-title>Mediciones </q-toolbar-title>
 
         <div>
           <q-icon :name="systemOnline ? 'wifi' : 'mdi-wifi-off'" :color="systemOnline ? 'secondary' : 'negative'" size="4rem"/>
